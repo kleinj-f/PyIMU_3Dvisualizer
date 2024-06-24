@@ -8,6 +8,7 @@ from tkinter import ttk
 import time
 import serial
 import threading
+import math
 
 ApplicationGL = False
 
@@ -100,10 +101,10 @@ def DrawGL():
     gluPerspective(90, (display[0]/display[1]), 0.1, 50.0)
     glTranslatef(0.0,0.0, -5)   
 
-    glRotatef(round(myimu.Pitch,1), 0, 0, 1)
-    glRotatef(round(myimu.Roll,1), -1, 0, 0)
+    glRotatef(myimu.Pitch, 0, 0, 1)
+    glRotatef(myimu.Roll, -1, 0, 0)
 
-    DrawText("Roll: {}°               Pitch: {}°".format(round(myimu.Roll,1),round(myimu.Pitch,1)))
+    DrawText("Roll: {}°               Pitch: {}°".format(round(myimu.Roll,2),round(myimu.Pitch,2)))
     DrawBoard()
     pygame.display.flip()
 
@@ -119,13 +120,13 @@ def ReadData():
         serial_input = serial_input.split(',')
         print(serial_input)
 
-        if(len(serial_input) == 9 and serial_input[0] == 0x24 ): 
-            Ax = int.from_bytes(X,byteorder = 'big',signed=True)
+        AX = float(serial_input[1])
+        AY = float(serial_input[2])
+        AZ = float(serial_input[3])
 
-            Ay = int.from_bytes(Y,byteorder = 'big',signed=True)
-
-            myimu.Roll = Ax/16384.0*90
-            myimu.Pitch = Ay/16384.0*90
+        #wrong math but works for visualization
+        myimu.Roll = AX * 90 / 9.81
+        myimu.Pitch = AY * 90 / 9.81
 
 
 def main():
