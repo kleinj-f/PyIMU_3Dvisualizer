@@ -12,8 +12,8 @@ import threading
 ApplicationGL = False
 
 class PortSettings:
-    Name = "COM1"
-    Speed = 9600
+    Name = "COM3"
+    Speed = 115200
     Timeout = 2
 class IMU:
     Roll = 0
@@ -114,12 +114,14 @@ def SerialConnection ():
 def ReadData():
     while True:
         
-        serial_input = serial_object.readline()
+        serial_input = serial_object.readline().decode('ascii')
+        serial_input = serial_input.strip()
+        serial_input = serial_input.split(',')
+        print(serial_input)
+
         if(len(serial_input) == 9 and serial_input[0] == 0x24 ): 
-            X = [serial_input[2], serial_input[1]]
             Ax = int.from_bytes(X,byteorder = 'big',signed=True)
 
-            Y = [serial_input[4], serial_input[3]]
             Ay = int.from_bytes(Y,byteorder = 'big',signed=True)
 
             myimu.Roll = Ax/16384.0*90
